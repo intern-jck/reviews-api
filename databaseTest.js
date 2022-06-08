@@ -30,11 +30,11 @@ const characteristicsKeys = [
   name
 ];
 
-
 const reviewsCollection = {
   id,
   product_id,
-  rating,date,
+  rating,
+  date,
   summary,body,
   recommend,
   reported,
@@ -43,12 +43,10 @@ const reviewsCollection = {
   response,
   helpfulness,
   'photos': [],
-
 };
 
 {
   "product_id": product_id,
-  "results": [
-    
-  ]
+  "results": []
 }
+
