@@ -131,7 +131,7 @@ const addCharacteristics = (csvPath) => {
     const update = {};
 
     update['meta.characteristics.' + name] = characteristic;
-    console.log(update)
+    console.log(update);
 
     Test.findOneAndUpdate(
       {
@@ -155,6 +155,49 @@ const addCharacteristics = (csvPath) => {
       });
 
 
+
+  });
+
+}
+
+const addRatingsAndRecs = (csvPath) => {
+  fs.createReadStream(path.resolve(__dirname, csvPath))
+  .pipe(csv.parse({ headers: true }))
+  .on('error', error => console.error(error))
+  .on('data', (row) => {
+    console.log(row);
+
+    const update = {
+      'meta.likes': {
+        $cond: {
+          if: {
+
+          }
+        }
+      }
+    };
+
+    Test.findOneAndUpdate(
+      {
+        'product_id': row.product_id,
+      },
+      {
+        $set: {
+          // loop through
+        }
+      },
+      {
+        useFindAndModify: false,
+        // new: true,
+      },
+      (err, result) => {
+        if (err) {
+          console.log('error', err)
+        }
+        if (result) {
+          // console.log(result)
+        }
+      });
 
   });
 }
