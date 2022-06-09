@@ -6,17 +6,19 @@ const { Schema } = mongoose;
 
 const reviewsCSV = './reviewsSimple.csv';
 const photosCSV = './photosSimple.csv';
+const characteristicsCSV = '../charsTest.csv';
+const reviewsCharacteristicsCSV = '../reviewCharTest.csv';
 
 mongoose.connect('mongodb://localhost/basic', { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
   console.log(`MongoDB Connected!`);
   // addReviews(reviewsCSV);
-  addPhotos(photosCSV);
+  // addPhotos(photosCSV);
+  addCharacteristics(characteristicsCSV);
 })
 .catch((err) => {
   console.log(`MongoDB ERR ${err}`);
 });
-
 
 const schema = new mongoose.Schema({
   product_id: String,
@@ -25,8 +27,11 @@ const schema = new mongoose.Schema({
         id: String,
         rating: String,
         photos: [{ id: String, url: String }]
-      }
-  ],
+      }],
+  meta: {
+    likes: Number,
+    characteristics: {}
+  }
 });
 
 const Test = mongoose.model('Examples', schema);
@@ -44,12 +49,13 @@ const addReviews = (csvPath) => {
       }
     });
 
-    console.log(result);
+    console.log(result, row);
     Test.findOneAndUpdate(
       {
       "product_id": row.product_id
       },
       {
+        'product_id': row.product_id,
         '$push': { results: result}
       },
       {
@@ -68,8 +74,6 @@ const addReviews = (csvPath) => {
     console.log(`Added ${rowCount} rows`)
   });
 }
-
-
 
 const addPhotos = (csvPath) => {
 
@@ -107,5 +111,50 @@ const addPhotos = (csvPath) => {
     })
   .on('end', (rowCount) => {
     console.log(`Added ${rowCount} rows`)
+  });
+}
+
+const addCharacteristics = (csvPath) => {
+  fs.createReadStream(path.resolve(__dirname, csvPath))
+  .pipe(csv.parse({ headers: true }))
+  .on('error', error => console.error(error))
+  .on('data', (row) => {
+    console.log(row);
+
+    let characteristic = {};
+    let name = row.name;
+    characteristic = {id: row.id, value: 0};
+
+    let metaFieldName = `meta.characteristics.${name}`;
+    console.log(metaFieldName, characteristic)
+
+    const update = {};
+
+    update['meta.characteristics.' + name] = characteristic;
+    console.log(update)
+
+    Test.findOneAndUpdate(
+      {
+        'product_id': row.product_id,
+      },
+      {
+        $set: update
+      },
+      {
+        useFindAndModify: false,
+        new: true,
+        upsert: true,
+      },
+      (err, result) => {
+        if (err) {
+          console.log('error', err)
+        }
+        if (result) {
+          // console.log(result)
+        }
+      });
+
+
+
   });
 }
