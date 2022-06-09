@@ -3,7 +3,6 @@ const path = require('path');
 const csv = require('fast-csv');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-// const reviewsSchema = require('./reviewsSchema.js')
 
 const reviewsCSV = './testData/reviewsTest.csv';
 const photosCSV = './testData/photosTest.csv';
@@ -51,6 +50,7 @@ const initializeReviews = (csvPath) => {
         result[key] = row[key];
       }
     });
+
     // console.log(row.product_id, result);
     Reviews.findOneAndUpdate(
       { product_id: row.product_id },
@@ -70,6 +70,7 @@ const initializeReviews = (csvPath) => {
         }
       }
     );
+
   })
   .on('end', (rowCount) => {
     console.log(`Added ${rowCount} rows`)

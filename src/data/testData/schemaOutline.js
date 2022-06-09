@@ -67,6 +67,5 @@
       'id': Number,
       'value': String
     }
+  }
 }
-
-
