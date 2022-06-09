@@ -43,21 +43,29 @@
     1: 6
   },
   "characteristics": {
-    "Size": {
+    "Fit": {
       "id": Number,
       "value": String // Decimal number ex 3.5000
     },
+    "Length": {
+      "id": Number,
+      "value": String
+    },
+    "Comfort": {
+      "id": Number,
+      "value": String
+    },
+    "Quality": {
+      "id": Number,
+      "value": String
+    },
+    "Size": {
+      'id': Number,
+      'value': String
+    },
     "Width": {
-      "id": Number,
-      "value": String
-    },
-    "Comfort": {
-      "id": Number,
-      "value": String
-    },
-    "Comfort": {
-      "id": Number,
-      "value": String
+      'id': Number,
+      'value': String
     }
 }
 
