@@ -9,17 +9,6 @@ const photosCSV = './photosSimple.csv';
 const characteristicsCSV = '../charsTest.csv';
 const reviewsCharacteristicsCSV = '../reviewCharTest.csv';
 
-mongoose.connect('mongodb://localhost/basic', { useNewUrlParser: true, useUnifiedTopology: true })
-.then(() => {
-  console.log(`MongoDB Connected!`);
-  addReviews(reviewsCSV);
-  // addPhotos(photosCSV);
-  // addCharacteristics(characteristicsCSV);
-  // updateCharacteristics(reviewsCharacteristicsCSV);
-})
-.catch((err) => {
-  console.log(`MongoDB ERR ${err}`);
-});
 
 const schema = new mongoose.Schema({
   product_id: String,
@@ -46,26 +35,7 @@ const schema = new mongoose.Schema({
   }
 });
 
-const metaRawSchema = new mongoose.Schema({
-  product_id: String,
-  results_meta: [
-    {
-      id: String,
-      rating: Number,
-      recommends: Boolean,
-      characteristics: [
-        {
-          id: String,
-          name: String,
-          value: Number
-        }
-      ]
-    }
-  ]
-});
-
 const Test = mongoose.model('Tests', schema);
-const MetaTest = mongoose.model('Metatests', metaRawSchema);
 
 const addReviews = (csvPath) => {
   fs.createReadStream(path.resolve(__dirname, csvPath))
@@ -99,7 +69,7 @@ const addReviews = (csvPath) => {
       },
       {
         'product_id': row.product_id,
-        // '$push': { results: result },
+        '$push': { results: result },
         '$inc': updateRating,
         '$inc': updateRecommends
       },
@@ -110,14 +80,14 @@ const addReviews = (csvPath) => {
       },
       (err, result) => {
         if(err) {console.log(err)}
-        if(result) {console.log(result)}
+        // if(result) {console.log(result)}
       })
 
     })
   .on('end', (rowCount) => {
     console.log(`Added ${rowCount} rows`)
   });
-}
+};
 
 const addPhotos = (csvPath) => {
 
@@ -151,7 +121,7 @@ const addPhotos = (csvPath) => {
   .on('end', (rowCount) => {
     console.log(`Added ${rowCount} photos`)
   });
-}
+};
 
 const addCharacteristics = (csvPath) => {
   fs.createReadStream(path.resolve(__dirname, csvPath))
@@ -160,12 +130,14 @@ const addCharacteristics = (csvPath) => {
   .on('data', (row) => {
 
     let characteristic = {};
-    let name = row.name;
-    characteristic = {id: row.id, value: 0};
-    const update = {};
-    update['meta.characteristics.' + name] = characteristic;
+    // let name = row.name;
+    // characteristic = {char_id: row.id, value:[]};
+    characteristic = {name: row.name, value:[]};
 
-    let metaCharacteristic = {id: row.id, name: row.name, value: row.value};
+    const update = {};
+    // update['meta.characteristics.' + name] = characteristic;
+    update['meta.characteristics.' + row.id] = characteristic;
+
 
     Test.findOneAndUpdate(
       {
@@ -183,25 +155,12 @@ const addCharacteristics = (csvPath) => {
         if (err) { console.log('error', err) }
       });
 
-    MetaTest.findOneAndUpdate(
-      {
-        'product_id': row.product_id,
-      },
-      {
-        $set: {}
-      },
-      {
-        useFindAndModify: false,
-        // new: true,
-        // upsert: true,
-      },
-      (err, result) => {
-        if (err) { console.log('error', err) }
-      });
-
+  })
+  .on('end', (rowCount) => {
+    console.log(`Added ${rowCount} chracteristics`)
   });
 
-}
+};
 
 const updateCharacteristics = (csvPath) => {
   fs.createReadStream(path.resolve(__dirname, csvPath))
@@ -210,12 +169,15 @@ const updateCharacteristics = (csvPath) => {
   .on('data', (row) => {
     console.log(row);
 
+    const update = {};
+    update['meta.characteristics.' + row.characteristic_id + '.value'] = parseInt(row.value);
+    console.log(update)
     Test.findOneAndUpdate(
       {
         'results.id': row.review_id,
       },
       {
-
+        $push: update
       },
       {
         useFindAndModify: false
@@ -224,5 +186,9 @@ const updateCharacteristics = (csvPath) => {
         if (err) { console.log('error', err) }
       });
 
+  })
+  .on('end', (rowCount) => {
+    console.log(`Updated ${rowCount} characteristics`)
   });
-}
+
+};
