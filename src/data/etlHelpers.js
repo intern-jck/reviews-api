@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const reviewsSchema = new Schema({
-  product_id: String,
+  product_id: { type: String, unique: true},
   results: [{
     id:  String,
     rating:  String,
@@ -36,16 +36,19 @@ const reviewsSchema = new Schema({
   }
 });
 
-const Test = mongoose.model('Tests', reviewsSchema);
+const Reviews = mongoose.model('Reviews', reviewsSchema);
+
+let operations = [];
 
 const addReviews = (csvPath) => {
+  const t0 = performance.now();
+
   fs.createReadStream(path.resolve(__dirname, csvPath))
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
 
     let result = {};
-
     // Build result
     Object.keys(row).map((key, i) => {
       if (key !== 'product_id') {
@@ -55,40 +58,98 @@ const addReviews = (csvPath) => {
 
     const updateRating = {};
     updateRating['meta.ratings.' + row.rating] = 1;
-
     const updateRecommends = {};
-
     if (row.recommend === 'false') {
       updateRecommends['meta.recommends.0'] = 1;
     } else if (row.recommend === 'true') {
       updateRecommends['meta.recommends.1'] = 1;
     }
 
-    Test.findOneAndUpdate(
+    // const findOneAndUpdateScript = {
+    //   'updateOne': {
+    //     'filter': { 'product_id': 'row.product_id' },
+    //     'update': {
+    //       'product_id': 'row.product_id',
+    //       // '$push': { results: result },
+    //       // '$inc': updateRating,
+    //       // '$inc': updateRecommends
+    //     },
+    //     'upsert': true,
+    //   }
+    // };
+
+    // operations.push(findOneAndUpdateScript);
+
+    // if (operations.length % 1000 === 0) {
+    //   Reviews.collection.bulkWrite(operations)
+    //   .then((result) => {
+    //     operations = [];
+    //     console.log(`Bulk Update OK!`);
+    //   })
+    //   .catch((error) => { console.log(error) });
+    // }
+
+
+    // console.log(row.product_id);
+
+    // const review = {
+    //   product_id: row.product_id,
+    // }
+    // Reviews.create(review, callback);
+
+    Reviews.findOneAndUpdate(
       {
-      "product_id": row.product_id
+        "product_id": row.product_id
       },
       {
-        'product_id': row.product_id,
+        // 'product_id': row.product_id,
         '$push': { results: result },
         '$inc': updateRating,
         '$inc': updateRecommends
       },
       {
         useFindAndModify: false,
-        new: true,
+        // new: true,
         upsert: true,
       },
       (err, result) => {
         if(err) {console.log(err)}
-        if(result) {console.log(result.product_id)}
-      })
+        if(result) {console.log(result, result.product_id)}
+      }
+    )
 
-    })
+  })
   .on('end', (rowCount) => {
-    console.log(`Added ${rowCount} rows`)
+    const t1 = performance.now();
+    console.log(`Added ${rowCount} rows @ ${(t1 - t0)/1000}`)
+
   });
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const addPhotos = (csvPath) => {
 
@@ -103,7 +164,7 @@ const addPhotos = (csvPath) => {
       }
     });
 
-    Test.findOneAndUpdate(
+    Reviews.findOneAndUpdate(
       {
         "results.id": row.review_id,
       },
@@ -141,7 +202,7 @@ const addCharacteristics = (csvPath) => {
     update['meta.characteristics.' + row.id] = characteristic;
 
 
-    Test.findOneAndUpdate(
+    Reviews.findOneAndUpdate(
       {
         'product_id': row.product_id,
       },
@@ -176,7 +237,7 @@ const updateCharacteristics = (csvPath) => {
     // update['meta.characteristics.' + row.characteristic_id + '.value'] = 'results.id';
 
     console.log(update)
-    Test.findOneAndUpdate(
+    Reviews.findOneAndUpdate(
       {
         'results.id': row.review_id,
       },

@@ -4,10 +4,10 @@ const csv = require('fast-csv');
 
 const csvPathsTest = {
   // 'reviews': '../reviewsTest.csv',
-  'reviews': '../../reviews-raw/reviews.csv',
-  'photos': 'photosTest.csv',
-  'reviewsChars': 'reviewCharTest.csv',
-  'chars': 'charsTest.csv',
+  // 'reviews': '../../reviews-raw/reviews.csv',
+  // 'photos': 'photosTest.csv',
+  // 'reviewsChars': 'reviewCharTest.csv',
+  // 'chars': 'charsTest.csv',
 }
 
 const getLength = (csvPath) => {
@@ -24,4 +24,4 @@ const getLength = (csvPath) => {
   });
 };
 
-console.log(getLength(csvPathsTest['reviews']));
+// console.log(getLength(csvPathsTest['reviews']));
