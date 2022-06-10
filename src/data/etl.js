@@ -15,14 +15,14 @@ const {
   addReviews,
   addPhotos,
   addCharacteristics,
-  updateCharacteristics } = require('./etlTestHelpers.js');
+  updateCharacteristics } = require('./etlHelpers.js');
   // TODO:
   // Update characteristic values to average of array values.
 
-const reviewsCSV = './reviewsSimple.csv';
-const photosCSV = './photosSimple.csv';
-const characteristicsCSV = '../charsTest.csv';
-const reviewsCharacteristicsCSV = '../reviewCharTest.csv';
+const reviewsCSV = './rawData/reviews.csv';
+const photosCSV = './rawData/reviews_photos.csv';
+const characteristicsCSV = './rawData/characteristics.csv';
+const reviewsCharacteristicsCSV = './rawData/characteristic_reviews.csv';
 
 mongoose.connect('mongodb://localhost/basic', { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
@@ -32,18 +32,18 @@ mongoose.connect('mongodb://localhost/basic', { useNewUrlParser: true, useUnifie
   console.log(`Adding Reviews`);
   addReviews(reviewsCSV);
 })
-.then(() => {
-  console.log(`Adding Photos`);
-  addPhotos(photosCSV);
-})
-.then(() => {
-  console.log(`Adding characteristics`);
-  addCharacteristics(characteristicsCSV);
-})
-.then(() => {
-  console.log(`Updating characteristics`);
-  updateCharacteristics(reviewsCharacteristicsCSV);
-})
+// .then(() => {
+//   console.log(`Adding Photos`);
+//   addPhotos(photosCSV);
+// })
+// .then(() => {
+//   console.log(`Adding characteristics`);
+//   addCharacteristics(characteristicsCSV);
+// })
+// .then(() => {
+//   console.log(`Updating characteristics`);
+//   updateCharacteristics(reviewsCharacteristicsCSV);
+// })
 .catch((err) => {
   console.log(`MongoDB ERR ${err}`);
 });

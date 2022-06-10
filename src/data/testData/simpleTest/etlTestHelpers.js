@@ -165,6 +165,8 @@ const updateCharacteristics = (csvPath) => {
 
     const update = {};
     update['meta.characteristics.' + row.characteristic_id + '.value'] = parseInt(row.value);
+    // update['meta.characteristics.' + row.characteristic_id + '.value'] = 'results.id';
+
     console.log(update)
     Test.findOneAndUpdate(
       {
