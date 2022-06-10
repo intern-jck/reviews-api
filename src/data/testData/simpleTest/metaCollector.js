@@ -12,9 +12,9 @@ const reviewsCharacteristicsCSV = '../reviewCharTest.csv';
 mongoose.connect('mongodb://localhost/basic', { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
   console.log(`MongoDB Connected!`);
-  // addReviews(reviewsCSV);
+  addReviews(reviewsCSV);
   // addPhotos(photosCSV);
-  addCharacteristics(characteristicsCSV);
+  // addCharacteristics(characteristicsCSV);
   // updateCharacteristics(reviewsCharacteristicsCSV);
 })
 .catch((err) => {
@@ -27,10 +27,10 @@ const schema = new mongoose.Schema({
       {
         id: String,
         rating: Number,
+        recommends: Boolean,
         photos: [{ id: String, url: String }]
       }],
   meta: {
-    likes: Number,
     ratings: {
       1: Number,
       2: Number,
@@ -38,24 +38,60 @@ const schema = new mongoose.Schema({
       4: Number,
       5: Number
     },
+    recommends: {
+      0: Number,
+      1: Number,
+    },
     characteristics: {}
   }
 });
 
-const Test = mongoose.model('Examples', schema);
+const metaRawSchema = new mongoose.Schema({
+  product_id: String,
+  results_meta: [
+    {
+      id: String,
+      rating: Number,
+      recommends: Boolean,
+      characteristics: [
+        {
+          id: String,
+          name: String,
+          value: Number
+        }
+      ]
+    }
+  ]
+});
+
+const Test = mongoose.model('Tests', schema);
+const MetaTest = mongoose.model('Metatests', metaRawSchema);
 
 const addReviews = (csvPath) => {
-
   fs.createReadStream(path.resolve(__dirname, csvPath))
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
+
     let result = {};
+
+    // Build result
     Object.keys(row).map((key, i) => {
       if (key !== 'product_id') {
         result[key] = row[key];
       }
     });
+
+    const updateRating = {};
+    updateRating['meta.ratings.' + row.rating] = 1;
+
+    const updateRecommends = {};
+
+    if (row.recommend === 'false') {
+      updateRecommends['meta.recommends.0'] = 1;
+    } else if (row.recommend === 'true') {
+      updateRecommends['meta.recommends.1'] = 1;
+    }
 
     Test.findOneAndUpdate(
       {
@@ -63,7 +99,9 @@ const addReviews = (csvPath) => {
       },
       {
         'product_id': row.product_id,
-        '$push': { results: result}
+        // '$push': { results: result },
+        '$inc': updateRating,
+        '$inc': updateRecommends
       },
       {
         useFindAndModify: false,
@@ -72,6 +110,7 @@ const addReviews = (csvPath) => {
       },
       (err, result) => {
         if(err) {console.log(err)}
+        if(result) {console.log(result)}
       })
 
     })
@@ -123,11 +162,28 @@ const addCharacteristics = (csvPath) => {
     let characteristic = {};
     let name = row.name;
     characteristic = {id: row.id, value: 0};
-
     const update = {};
     update['meta.characteristics.' + name] = characteristic;
 
+    let metaCharacteristic = {id: row.id, name: row.name, value: row.value};
+
     Test.findOneAndUpdate(
+      {
+        'product_id': row.product_id,
+      },
+      {
+        $set: update
+      },
+      {
+        useFindAndModify: false,
+        // new: true,
+        // upsert: true,
+      },
+      (err, result) => {
+        if (err) { console.log('error', err) }
+      });
+
+    MetaTest.findOneAndUpdate(
       {
         'product_id': row.product_id,
       },
@@ -142,6 +198,7 @@ const addCharacteristics = (csvPath) => {
       (err, result) => {
         if (err) { console.log('error', err) }
       });
+
   });
 
 }
