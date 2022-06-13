@@ -1,5 +1,6 @@
 /node_modules
 /data-raw
+/data-1M
 /data-100k
 /data-50k
 /data-test

@@ -3,6 +3,8 @@ const path = require('path');
 const csv = require('fast-csv');
 const mongoose = require('mongoose');
 
+const photosLength = 2742540;
+
 const BasicReview = require('./BasicModel.js');
 console.log(BasicReview)
 
@@ -46,24 +48,6 @@ const addReviews = (csvPath) => {
         '$inc': updateRecommends
     };
 
-    const options = {
-        upsert: true,
-    };
-
-    // Not sure if this is needed right now...
-    const updateOneCallBack = (error, result) => {
-      // if (error) {
-      //     // console.log(`ERROR: ${error}`)
-      //   }
-      // if (result) {
-      //   const tAdded = performance.now();
-      //   console.log(`ADDED: ${row.product_id} @ ${tAdded - t0}`)
-      // }
-    }
-
-    // BasicReview.updateOne( filter, update, options, updateOneCallBack );
-
-
     const updateOne = {
       updateOne: {
         filter,
@@ -75,7 +59,8 @@ const addReviews = (csvPath) => {
     operations.push(updateOne)
 
     if(operations.length > 10000) {
-      console.log('bulk update');
+      const tEnd = performance.now();
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)}`);
       BasicReview.bulkWrite(operations);
       operations = [];
     }
@@ -88,7 +73,7 @@ const addReviews = (csvPath) => {
       operations = [];
     }
     const tEnd = performance.now();
-    console.log(`Added ${rowCount} rows in ${tEnd - t0}`)
+    console.log(`Added ${rowCount} rows in ${tEnd - t0}`);
   });
 };
 
@@ -134,10 +119,11 @@ const addPhotos = (csvPath) => {
     };
 
     operations.push(updateOne)
-
+//Math.round(parseInt(row.id)/photosLength
     if(operations.length > 10000) {
-      console.log('bulk update');
       BasicReview.bulkWrite(operations);
+      const tEnd = performance.now();
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ photosLength) * 100)}%`);
       operations = [];
     }
 
@@ -278,7 +264,6 @@ const updateCharacteristics = (csvPath) => {
   });
 
 };
-
 
 module.exports = {
   addReviews,
