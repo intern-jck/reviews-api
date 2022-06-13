@@ -116,16 +116,23 @@ const addCharacteristics = (csvPath) => {
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
+
+    // Filter
+    const filter = { 'product_id': row.product_id };
+
+    // Update
     let characteristic = {};
     characteristic = {name: row.name, value:[]};
     let characteristicKey = 'meta.characteristics.' + row.id;
-    const filter = { 'product_id': row.product_id };
-    const updateCharacteristic = {};
-    updateCharacteristic[characteristicKey] = characteristic;
+    const newCharacteristic = {};
+    newCharacteristic[characteristicKey] = characteristic;
     const update = {
-        $set: updateCharacteristic
+        $set: newCharacteristic
     };
 
+    // Options
+
+    // Callback
     // Not sure if this is needed right now...
     const updateOneCallBack = (error, result) => {
       // if (error) {
@@ -138,30 +145,6 @@ const addCharacteristics = (csvPath) => {
     }
 
     BasicReview.updateOne( filter, update, updateOneCallBack );
-
-
-    // let characteristic = {};
-    // characteristic = {name: row.name, value:[]};
-
-    // const update = {};
-    // update['meta.characteristics.' + row.id] = characteristic;
-
-
-    // Test.findOneAndUpdate(
-    //   {
-    //     'product_id': row.product_id,
-    //   },
-    //   {
-    //     $set: update
-    //   },
-    //   {
-    //     useFindAndModify: false,
-    //     // new: true,
-    //     // upsert: true,
-    //   },
-    //   (err, result) => {
-    //     if (err) { console.log('error', err) }
-    //   });
 
   })
   .on('end', (rowCount) => {
@@ -179,30 +162,34 @@ const updateCharacteristics = (csvPath) => {
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
-    console.log(row);
 
-    const update = {};
-    update['meta.characteristics.' + row.characteristic_id + '.value'] = parseInt(row.value);
-    // update['meta.characteristics.' + row.characteristic_id + '.value'] = 'results.id';
+    const filter = { 'results.id': row.review_id };
 
-    console.log(update)
-    Test.findOneAndUpdate(
-      {
-        'results.id': row.review_id,
-      },
-      {
-        $push: update
-      },
-      {
-        useFindAndModify: false
-      },
-      (err, result) => {
-        if (err) { console.log('error', err) }
-      });
+    const updateCharacteristic = {};
+    const characteristicKey = 'meta.characteristics.' + row.characteristic_id + '.value';
+    updateCharacteristic[characteristicKey] = parseInt(row.value);
+    const update = {
+      $push: updateCharacteristic,
+    };
+
+    // Callback
+    // Not sure if this is needed right now...
+    const updateOneCallBack = (error, result) => {
+      if (error) {
+            console.log(`ERROR: ${error}`)
+          }
+      // if (result) {
+      //     const tAdded = performance.now();
+      //     console.log(`ADDED: ${row.id} @ ${tAdded - t0}`)
+      //   }
+    }
+
+    BasicReview.updateOne( filter, update, updateOneCallBack );
 
   })
   .on('end', (rowCount) => {
-    console.log(`Updated ${rowCount} characteristics`)
+    const tEnd = performance.now();
+    console.log(`Added ${rowCount} rows in ${tEnd - t0}`);
   });
 
 };
