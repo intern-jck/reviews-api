@@ -7,6 +7,7 @@ const BasicReview = require('./BasicModel.js');
 console.log(BasicReview)
 
 const addReviews = (csvPath) => {
+  console.log(`Adding Reviews`);
 
   const t0 = performance.now();
 
@@ -69,12 +70,14 @@ const addReviews = (csvPath) => {
 
 const addPhotos = (csvPath) => {
 
+  console.log(`Adding Photos`);
   const t0 = performance.now();
 
   fs.createReadStream(path.resolve(__dirname, csvPath))
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
+
     let photo = {};
     Object.keys(row).map((key, i) => {
       if (key !== 'review_id') {
@@ -86,6 +89,7 @@ const addPhotos = (csvPath) => {
     const update = {
         $push: { 'results.$.photos': photo}
     };
+
     // Not sure if this is needed right now...
     const updateOneCallBack = (error, result) => {
       // if (error) {
@@ -107,45 +111,70 @@ const addPhotos = (csvPath) => {
 };
 
 const addCharacteristics = (csvPath) => {
+  const t0 = performance.now();
   fs.createReadStream(path.resolve(__dirname, csvPath))
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
-
     let characteristic = {};
-    // let name = row.name;
-    // characteristic = {char_id: row.id, value:[]};
     characteristic = {name: row.name, value:[]};
+    let characteristicKey = 'meta.characteristics.' + row.id;
+    const filter = { 'product_id': row.product_id };
+    const updateCharacteristic = {};
+    updateCharacteristic[characteristicKey] = characteristic;
+    const update = {
+        $set: updateCharacteristic
+    };
 
-    const update = {};
-    // update['meta.characteristics.' + name] = characteristic;
-    update['meta.characteristics.' + row.id] = characteristic;
+    // Not sure if this is needed right now...
+    const updateOneCallBack = (error, result) => {
+      // if (error) {
+      //     console.log(`ERROR: ${error}`)
+      //   }
+      // if (result) {
+      //   const tAdded = performance.now();
+      //   console.log(`ADDED: ${row.id} @ ${tAdded - t0}`)
+      // }
+    }
+
+    BasicReview.updateOne( filter, update, updateOneCallBack );
 
 
-    Test.findOneAndUpdate(
-      {
-        'product_id': row.product_id,
-      },
-      {
-        $set: update
-      },
-      {
-        useFindAndModify: false,
-        // new: true,
-        // upsert: true,
-      },
-      (err, result) => {
-        if (err) { console.log('error', err) }
-      });
+    // let characteristic = {};
+    // characteristic = {name: row.name, value:[]};
+
+    // const update = {};
+    // update['meta.characteristics.' + row.id] = characteristic;
+
+
+    // Test.findOneAndUpdate(
+    //   {
+    //     'product_id': row.product_id,
+    //   },
+    //   {
+    //     $set: update
+    //   },
+    //   {
+    //     useFindAndModify: false,
+    //     // new: true,
+    //     // upsert: true,
+    //   },
+    //   (err, result) => {
+    //     if (err) { console.log('error', err) }
+    //   });
 
   })
   .on('end', (rowCount) => {
-    console.log(`Added ${rowCount} chracteristics`)
+    const tEnd = performance.now();
+    console.log(`Added ${rowCount} rows in ${tEnd - t0}`);
   });
 
 };
 
 const updateCharacteristics = (csvPath) => {
+
+  const t0 = performance.now();
+
   fs.createReadStream(path.resolve(__dirname, csvPath))
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
