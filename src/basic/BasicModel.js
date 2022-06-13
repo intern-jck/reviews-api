@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const BasicSchema = new Schema({
-  product_id: { type: String, unique: true },
+  // product_id: { type: String, unique: true },
+  product_id: String,
   results: [{
     id:  String,
     rating:  String,

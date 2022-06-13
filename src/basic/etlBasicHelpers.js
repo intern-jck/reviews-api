@@ -35,67 +35,41 @@ const addReviews = (csvPath) => {
       updateRecommends['meta.recommends.1'] = 1;
     }
 
-    const newReview = new BasicReview({
-      product_id: row.product_id,
+    const filter = { product_id: row.product_id };
+    const update = {
+        'product_id': row.product_id,
+        '$push': { results: result },
+        '$inc': updateRating,
+        '$inc': updateRecommends
+    };
 
-    });
+    const options = {
+        upsert: true,
+    };
 
-    newReview.save((error, result) => {
+    // Not sure if this is needed right now...
+    const updateOneCallBack = (error, result) => {
+      // if (error) {
+      //     // console.log(`ERROR: ${error}`)
+      //   }
+      // if (result) {
+      //   const tAdded = performance.now();
+      //   console.log(`ADDED: ${row.product_id} @ ${tAdded - t0}`)
+      // }
+    }
 
-      // Is this good form?
-      // error ?
-      //   console.log(error)
-      //   : result ?
-      //     console.log(result)
-      //     : null;
-
-      if (error) {
-        // console.log(`ERROR: ${error.code}`)
-        const tAddError = performance.now();
-      }
-      if (result) {
-        const tAdded = performance.now();
-
-        console.log(`ADDED: ${result.product_id} @ ${tAdded - t0}`)
-      }
-
-    })
-    // .then((result) => {
-    //   const tFinished = performance.now();
-    //   console.log(result)
-    // })
-    // .catch((error) => {
-    //   const tError = performance.now();
-    //   console.log(`ERROR @ ${tError - t0} >>>> ${error}`)
-    // });
-
-    // Test.findOneAndUpdate(
-    //   {
-    //   "product_id": row.product_id
-    //   },
-    //   {
-    //     'product_id': row.product_id,
-    //     '$push': { results: result },
-    //     '$inc': updateRating,
-    //     '$inc': updateRecommends
-    //   },
-    //   {
-    //     useFindAndModify: false,
-    //     new: true,
-    //     upsert: true,
-    //   },
-    //   (err, result) => {
-    //     if(err) {console.log(err)}
-    //     // if(result) {console.log(result)}
-    //   })
+    BasicReview.updateOne( filter, update, options, updateOneCallBack );
 
     })
   .on('end', (rowCount) => {
-    console.log(`Added ${rowCount} rows`)
+    const tEnd = performance.now();
+    console.log(`Added ${rowCount} rows in ${tEnd - t0}`)
   });
 };
 
 const addPhotos = (csvPath) => {
+
+  const t0 = performance.now();
 
   fs.createReadStream(path.resolve(__dirname, csvPath))
   .pipe(csv.parse({ headers: true }))
@@ -108,24 +82,27 @@ const addPhotos = (csvPath) => {
       }
     });
 
-    Test.findOneAndUpdate(
-      {
-        "results.id": row.review_id,
-      },
-      {
+    const filter = { "results.id": row.review_id };
+    const update = {
         $push: { 'results.$.photos': photo}
-      },
-      {
-        useFindAndModify: false,
-        new: true,
-      },
-      (err, result) => {
-        if(err) {console.log(err)}
-      })
+    };
+    // Not sure if this is needed right now...
+    const updateOneCallBack = (error, result) => {
+      // if (error) {
+      //     // console.log(`ERROR: ${error}`)
+      //   }
+      // if (result) {
+      //   const tAdded = performance.now();
+      //   console.log(`ADDED: ${row.product_id} @ ${tAdded - t0}`)
+      // }
+    }
 
-    })
+    BasicReview.updateOne( filter, update, updateOneCallBack );
+
+  })
   .on('end', (rowCount) => {
-    console.log(`Added ${rowCount} photos`)
+    const tEnd = performance.now();
+    console.log(`Added ${rowCount} rows in ${tEnd - t0}`)
   });
 };
 

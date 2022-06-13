@@ -25,3 +25,7 @@ const getLength = (csvPath) => {
 };
 
 // console.log(getLength(csvPathsTest['reviews']));
+
+module.exports = {
+  getlength,
+}
