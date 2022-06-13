@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const BasicReview = require('./BasicModel.js');
 console.log(BasicReview)
 
+let operations = [];
+
 const addReviews = (csvPath) => {
   console.log(`Adding Reviews`);
 
@@ -59,10 +61,32 @@ const addReviews = (csvPath) => {
       // }
     }
 
-    BasicReview.updateOne( filter, update, options, updateOneCallBack );
+    // BasicReview.updateOne( filter, update, options, updateOneCallBack );
 
-    })
+
+    const updateOne = {
+      updateOne: {
+        filter,
+        update,
+        'upsert': true
+      }
+    };
+
+    operations.push(updateOne)
+
+    if(operations.length > 10000) {
+      console.log('bulk update');
+      BasicReview.bulkWrite(operations);
+      operations = [];
+    }
+
+  })
   .on('end', (rowCount) => {
+    if(operations.length > 0) {
+      console.log('bulk update');
+      BasicReview.bulkWrite(operations);
+      operations = [];
+    }
     const tEnd = performance.now();
     console.log(`Added ${rowCount} rows in ${tEnd - t0}`)
   });
