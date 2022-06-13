@@ -4,7 +4,9 @@ const csv = require('fast-csv');
 const mongoose = require('mongoose');
 const { addReviews, addPhotos, addCharacteristics, updateCharacteristics } = require('./etlBasicHelpers.js');
 
+// const reviewsCSV = '../../data-100K/reviews100K.csv';
 const reviewsCSV = '../../data-1M/reviews1M.csv';
+// const photosCSV = '../../data-50K/photos50K.csv';
 const photosCSV = '../../data-1M/photos1M.csv';
 // const characteristicsCSV = '../../data-50k/characteristics50k.csv';
 // const characteristicReviewsCSV = '../../data-50k/characteristicReviews50k.csv';
@@ -23,12 +25,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
   .then(() => {
     console.log(`MongoDB Connected!`);
   })
-  .then(() => {
-    addReviews(reviewsCSV);
-  })
   // .then(() => {
-  //   addPhotos(photosCSV);
+  //   addReviews(reviewsCSV);
   // })
+  .then(() => {
+    addPhotos(photosCSV);
+  })
   // .then(() => {
   //   addCharacteristics(characteristicsCSV);
   // })

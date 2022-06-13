@@ -43,3 +43,20 @@
 //   console.log(`Updating characteristics`);
 //   updateCharacteristics(reviewsCharacteristicsCSV);
 // })
+
+
+    // const filter = { product_id: row.product_id };
+
+    // const update = {
+    //     'product_id': row.product_id,
+    //     '$push': { results: result },
+    //     '$inc': updateRating,
+    //     '$inc': updateRecommends
+    // };
+
+
+
+
+
+
+
