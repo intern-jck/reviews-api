@@ -4,17 +4,17 @@ const csv = require('fast-csv');
 const mongoose = require('mongoose');
 const { addReviews, addPhotos, addCharacteristics, updateCharacteristics } = require('./etlBasicHelpers.js');
 
-// const reviewsCSV = '../../data-100K/reviews100K.csv';
-const reviewsCSV = '../../data-1M/reviews1M.csv';
+// const reviewsCSV = '../../data-50K/reviews50K.csv';
+// const reviewsCSV = '../../data-1M/reviews1M.csv';
 // const photosCSV = '../../data-50K/photos50K.csv';
-const photosCSV = '../../data-1M/photos1M.csv';
-// const characteristicsCSV = '../../data-50k/characteristics50k.csv';
+// const photosCSV = '../../data-1M/photos1M.csv';
+// const characteristicsCSV = '../../data-50K/characteristics50K.csv';
 // const characteristicReviewsCSV = '../../data-50k/characteristicReviews50k.csv';
 
-// const reviewsCSV = '../../data-raw/reviewsRaw.csv';
-// const photosCSV = '../../data-raw/photosRaw.csv';
-// const characteristicsCSV = '../../data-raw/characteristicsRaw.csv';
-// const characteristicReviewsCSV = '../../data-raw/characteristicReviewsRaw.csv';
+const reviewsCSV = '../../data-raw/reviewsRaw.csv';
+const photosCSV = '../../data-raw/photosRaw.csv';
+const characteristicsCSV = '../../data-raw/characteristicsRaw.csv';
+const characteristicReviewsCSV = '../../data-raw/characteristicReviewsRaw.csv';
 
 // Need to add a port number?
 mongoose.connect('mongodb://127.0.0.1:27017/reviews',
@@ -28,9 +28,9 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
   // .then(() => {
   //   addReviews(reviewsCSV);
   // })
-  .then(() => {
-    addPhotos(photosCSV);
-  })
+  // .then(() => {
+  //   addPhotos(photosCSV);
+  // })
   // .then(() => {
   //   addCharacteristics(characteristicsCSV);
   // })

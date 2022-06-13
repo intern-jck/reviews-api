@@ -2,8 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const csv = require('fast-csv');
 const mongoose = require('mongoose');
+
 const reviewsLength = 5774952;
 const photosLength = 2742540;
+const chracteristicsLength = 3347679;
+const reviewChracteristicsLength = 19327575;
 
 const BasicReview = require('./BasicModel.js');
 console.log(BasicReview)
@@ -19,14 +22,6 @@ const addReviews = (csvPath) => {
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
-
-    // let result = {};
-    // // Build result
-    // Object.keys(row).map((key, i) => {
-    //   if (key !== 'product_id') {
-    //     result[key] = row[key];
-    //   }
-    // });
 
     const updateRating = {};
     updateRating['meta.ratings.' + row.rating] = 1;
@@ -67,7 +62,7 @@ const addReviews = (csvPath) => {
 
     operations.push(reviewOP);
 
-    if (operations.length > 1000) {
+    if (operations.length > 5000) {
       const tEnd = performance.now();
       console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ reviewsLength) * 100)}%`);
       BasicReview.bulkWrite(operations);
@@ -94,33 +89,6 @@ const addPhotos = (csvPath) => {
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
-    // console.log(row)
-    // let photo = {};
-    // Object.keys(row).map((key, i) => {
-    //   if (key !== 'review_id') {
-    //     photo[key] = row[key];
-    //   }
-    // });
-
-    // const filter = { "results.review_id": row.review_id };
-    // const update = {
-    //     $push: { 'results.$.photos': {
-    //       'id': row.id,
-    //       'url': row.url,
-    //     }}
-    // };
-
-    // Not sure if this is needed right now...
-    // const updateOneCallBack = (error, result) => {
-    //   // if (error) {
-    //   //     // console.log(`ERROR: ${error}`)
-    //   //   }
-    //   // if (result) {
-    //   //   const tAdded = performance.now();
-    //   //   console.log(`ADDED: ${row.product_id} @ ${tAdded - t0}`)
-    //   // }
-    // }
-    // BasicReview.updateOne( filter, update, updateOneCallBack );
 
     const updateOne = {
       updateOne: {
@@ -137,8 +105,7 @@ const addPhotos = (csvPath) => {
 
     operations.push(updateOne);
 
-    if (operations.length > 1000) {
-      // console.log(operations[0]);
+    if (operations.length > 5000) {
       BasicReview.bulkWrite(operations);
       const tEnd = performance.now();
       console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ photosLength) * 100)}%`);
@@ -165,54 +132,33 @@ const addCharacteristics = (csvPath) => {
   .on('error', error => console.error(error))
   .on('data', (row) => {
 
-    // Filter
-    const filter = { 'product_id': row.product_id };
-
-    // Update
-    let characteristic = {};
-    characteristic = {name: row.name, value:[]};
-    let characteristicKey = 'meta.characteristics.' + row.id;
     const newCharacteristic = {};
-    newCharacteristic[characteristicKey] = characteristic;
-    const update = {
-        $set: newCharacteristic
+    newCharacteristic['meta.characteristics.' + row.id] = {
+      name: row.name,
+      value: []
     };
-
-    // Options
-
-    // Callback
-    // Not sure if this is needed right now...
-    const updateOneCallBack = (error, result) => {
-      // if (error) {
-      //     console.log(`ERROR: ${error}`)
-      //   }
-      // if (result) {
-      //   const tAdded = performance.now();
-      //   console.log(`ADDED: ${row.id} @ ${tAdded - t0}`)
-      // }
-    }
-
-    // BasicReview.updateOne( filter, update, updateOneCallBack );
 
     const updateOne = {
       updateOne: {
-        filter,
-        update,
+        'filter': { 'product_id': row.product_id },
+        'update': {
+          $set: newCharacteristic
+        },
       }
     };
 
     operations.push(updateOne)
 
-    if(operations.length > 10000) {
-      console.log('bulk update');
+    if(operations.length > 5000) {
       BasicReview.bulkWrite(operations);
+      const tEnd = performance.now();
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ chracteristicsLength) * 100)}%`);
       operations = [];
     }
 
   })
   .on('end', (rowCount) => {
     if(operations.length > 0) {
-      console.log('bulk update');
       BasicReview.bulkWrite(operations);
       operations = [];
     }
@@ -231,48 +177,30 @@ const updateCharacteristics = (csvPath) => {
   .on('error', error => console.error(error))
   .on('data', (row) => {
 
-    const filter = { 'results.id': row.review_id };
-
     const updateCharacteristic = {};
-    const characteristicKey = 'meta.characteristics.' + row.characteristic_id + '.value';
-    updateCharacteristic[characteristicKey] = parseInt(row.value);
-    const update = {
-      $push: updateCharacteristic,
-    };
-
-    // Callback
-    // Not sure if this is needed right now...
-    const updateOneCallBack = (error, result) => {
-      if (error) {
-            console.log(`ERROR: ${error}`)
-          }
-      // if (result) {
-      //     const tAdded = performance.now();
-      //     console.log(`ADDED: ${row.id} @ ${tAdded - t0}`)
-      //   }
-    }
-
-    // BasicReview.updateOne( filter, update, updateOneCallBack );
+    updateCharacteristic['meta.characteristics.' + row.characteristic_id + '.value'] = parseInt(row.value);
 
     const updateOne = {
       updateOne: {
-        filter,
-        update,
+        'filter': { 'results.id': row.review_id },
+        'update': {
+          $push: updateCharacteristic,
+        },
       }
     };
 
     operations.push(updateOne)
 
-    if(operations.length > 10000) {
-      console.log('bulk update');
+    if(operations.length > 5000) {
       BasicReview.bulkWrite(operations);
+      const tEnd = performance.now();
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ reviewChracteristicsLength) * 100)}%`);
       operations = [];
     }
 
   })
   .on('end', (rowCount) => {
     if(operations.length > 0) {
-      console.log('bulk update');
       BasicReview.bulkWrite(operations);
       operations = [];
     }
