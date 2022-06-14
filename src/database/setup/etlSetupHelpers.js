@@ -39,7 +39,7 @@ const addReviews = (csvPath) => {
         'update': {
           'product_id': row.product_id,
           '$push': {
-            results:     {
+            results: {
               'id':  row.id,
               'rating':  row.rating,
               'date': row.date,
