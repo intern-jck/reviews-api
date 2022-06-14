@@ -7,9 +7,9 @@ const { addReviews, addPhotos, addCharacteristics, updateCharacteristics } = req
 // const reviewsCSV = '../../../data-1K/reviews1K.csv';
 
 const reviewsCSV = '../../../data-50K/reviews50K.csv';
-// const photosCSV = '../../data-50K/photos50K.csv';
-// const characteristicsCSV = '../../data-50K/characteristics50K.csv';
-// const characteristicReviewsCSV = '../../data-50k/characteristicReviews50k.csv';
+const photosCSV = '../../../data-50K/photos50K.csv';
+const characteristicsCSV = '../../../data-50K/characteristics50K.csv';
+const characteristicReviewsCSV = '../../../data-50K/characteristicReviews50K.csv';
 
 // const reviewsCSV = '../../data-1M/reviews1M.csv';
 // const photosCSV = '../../data-1M/photos1M.csv';
@@ -28,18 +28,18 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
   .then(() => {
     console.log(`MongoDB Connected!`);
   })
-  .then(() => {
-    addReviews(reviewsCSV);
-  })
+  // .then(() => {
+  //   addReviews(reviewsCSV);
+  // })
   // .then(() => {
   //   addPhotos(photosCSV);
   // })
   // .then(() => {
   //   addCharacteristics(characteristicsCSV);
   // })
-  // .then(() => {
-  //   updateCharacteristics(characteristicReviewsCSV);
-  // })
+  .then(() => {
+    updateCharacteristics(characteristicReviewsCSV);
+  })
   .catch((err) => {
     console.log(`MongoDB ERR ${err}`);
   });

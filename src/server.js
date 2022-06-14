@@ -7,14 +7,10 @@ app.use(express.json());
 
 const { getReviews, addReview } = require('./database/controllers.js');
 
-// axios.get(`${url}/reviews/${id}/ list?sort=${sortString}:asc&count=${count}}`)
-// axios.get(`${url}/reviews/${id}/meta`);
-
 app.get('/*', (req, res) => {
   console.log(req.params);
   console.log(req.query);
   let path = req.params[0].split('/');
-
 
   if (path[0] === 'reviews') {
     // get reviews for product_id and type.
@@ -47,33 +43,9 @@ app.get('/*', (req, res) => {
 });
 
 app.post('/*', (req, res) => {
-  console.log('GOT: ',req.body)
-
+  // console.log('GOT: ',req.body)
   addReview(req.body)
-  .then((data) => {
-    console.log('DB SENT', data)
-    res.sendStatus(201)
-  })
-  .catch();
-
 });
-
-// app.put();
-/*
-
-axios.put(`${url}/reviews/report/${reviewId}`);
-
-axios.post(`${url}/reviews/${id}`, {
-  rating: rating,
-  summary: summary,
-  body: body,
-  recommend: recommend,
-  name: name,
-  email: email,
-  photos: photos,
-  characteristics: characteristics,
-})
-*/
 
 app.listen(PORT, function() {
   console.log(`@http://localhost:${PORT} on port ${PORT}`);
