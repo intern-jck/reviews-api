@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const BasicSchema = new Schema({
-  // product_id: { type: String, unique: true },
+const ReviewSchema = new Schema({
   product_id: String,
   results: [{
     id:  String,
@@ -34,5 +33,5 @@ const BasicSchema = new Schema({
   }
 });
 
-const BasicReview = mongoose.model('Reviews', BasicSchema);
-module.exports = BasicReview;
+const Review = mongoose.model('Reviews', ReviewSchema);
+module.exports = Review;
