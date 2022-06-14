@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const ReviewSchema = new Schema({
-  product_id: String,
+  product_id: Number,
   results: [{
-    id:  String,
-    rating:  String,
+    id:  Number,
+    rating:  Number,
     date: Date,
     summary: String,
     body: String,
@@ -33,5 +33,5 @@ const ReviewSchema = new Schema({
   }
 });
 
-const Review = mongoose.model('Reviews', ReviewSchema);
+const Review = mongoose.model('Tests', ReviewSchema);
 module.exports = Review;

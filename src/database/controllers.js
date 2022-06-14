@@ -13,6 +13,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
     console.log(`MongoDB ERR ${err}`);
   });
 
+
+// GET REQ
 const getReviews = (product_id, type) => {
   console.log(`Getting ${type} for ${product_id}`);
   switch(type) {
@@ -28,6 +30,8 @@ const getReviews = (product_id, type) => {
   }
 }
 
+
+// POST REQ BODY
 // Parameter        Type    Description
 // product_id       int     Required ID of the product to post the review for
 // rating           int     Integer (1-5) indicating the review rating
@@ -64,6 +68,7 @@ const getReviews = (product_id, type) => {
 //   'upsert': true
 // }
 
+
 const addReview = (data) => {
 
   // console.log(`Adding ${data}`);
@@ -83,14 +88,19 @@ const addReview = (data) => {
 // console.log(date.toISOString())
   let reviewIdMax;
 
-  return Review.find()
-    .sort({'product_id': -1})
-    .limit(1)
-    .then((doc) => {
-      // reviewIdMax = doc[0].results;
-      console.log(doc);
-      return doc;
-    })
+
+  // const indexes = Review.aggregate([
+  //   { $match: {}}
+  // ])
+  return Review.find().count();
+  // return Review.find()
+  //   .sort({'product_id': -1})
+  //   .limit(1)
+  //   .then((doc) => {
+  //     // reviewIdMax = doc[0].results;
+  //     console.log(doc);
+  //     return doc;
+  //   })
     // .exec();
 
   // return Review.updateOne(

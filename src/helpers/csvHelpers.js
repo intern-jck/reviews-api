@@ -3,7 +3,7 @@ const path = require('path');
 const csv = require('fast-csv');
 
 const csvPathsTest = {
-  // 'reviews': '../reviewsTest.csv',
+  'reviews': '../../../data-50K/reviews50K.csv',
   // 'reviews': '../../reviews-raw/reviews.csv',
   // 'photos': 'photosTest.csv',
   // 'reviewsChars': 'reviewCharTest.csv',
@@ -17,15 +17,19 @@ const getLength = (csvPath) => {
   .on('error', error => console.error(error))
   .on('data', (row) => {
     // console.log(row);
+    return row;
   })
-  .on('end', (rowCount) => {
-    console.log(`Parsed ${rowCount} rows`)
-    return rowCount
+  .on('end', (...args) => {
+    console.log(`Parsed rows ${args}`)
+    // return rowCount
   });
 };
 
 // console.log(getLength(csvPathsTest['reviews']));
 
-module.exports = {
-  getlength,
-}
+// module.exports = {
+//   getlength,
+// }
+
+
+getLength(csvPathsTest['reviews'])

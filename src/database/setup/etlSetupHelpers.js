@@ -8,8 +8,7 @@ const photosLength = 2742540;
 const chracteristicsLength = 3347679;
 const reviewChracteristicsLength = 19327575;
 
-const BasicReview = require('./BasicModel.js');
-console.log(BasicReview)
+const BasicReview = require('../ReviewModel.js');
 
 let operations = [];
 
@@ -41,7 +40,7 @@ const addReviews = (csvPath) => {
           '$push': {
             results: {
               'id':  row.id,
-              'rating':  row.rating,
+              'rating': row.rating,
               'date': row.date,
               'summary': row.summary,
               'body': row.body,
@@ -62,21 +61,41 @@ const addReviews = (csvPath) => {
 
     operations.push(reviewOP);
 
-    if (operations.length > 5000) {
+    if (operations.length > 1000) {
       const tEnd = performance.now();
-      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ reviewsLength) * 100)}%`);
+      // console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ reviewsLength) * 100)}%`);
       BasicReview.bulkWrite(operations);
       operations = [];
     }
 
   })
   .on('end', (rowCount) => {
+
     if(operations.length > 0) {
       BasicReview.bulkWrite(operations);
       operations = [];
     }
+
     const tEnd = performance.now();
     console.log(`Added ${rowCount} rows in ${tEnd - t0}`);
+    // Hacky way to keep track of reviews
+    const filter = { 'product_id': 0};
+    const update = { '$set': { 'review_count': rowCount } }
+    const options = {
+      returnNewDocument: true,
+      new: true,
+      strict: false,
+      upsert: true
+    }
+
+    const callback = (err, doc) => {
+      if (err) { console.log(err) }
+      if (doc) { console.log(doc) }
+      console.log('end')
+    };
+
+    BasicReview.findOneAndUpdate(filter, update, options, callback);
+
   });
 };
 
