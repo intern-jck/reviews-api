@@ -1,4 +1,3 @@
 /node_modules
-/reviews-raw
-/src/data/rawData
-/src/data/scaledTestData
+/data-50K
+/data-raw
