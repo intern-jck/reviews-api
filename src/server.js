@@ -30,7 +30,6 @@ app.get('/*', (req, res) => {
           delete chars[c];
         }
       }
-
       res.send(doc);
     })
     .catch((error) => {
