@@ -37,9 +37,9 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
   // .then(() => {
   //   addCharacteristics(characteristicsCSV);
   // })
-  .then(() => {
-    updateCharacteristics(characteristicReviewsCSV);
-  })
+  // .then(() => {
+  //   updateCharacteristics(characteristicReviewsCSV);
+  // })
   .catch((err) => {
     console.log(`MongoDB ERR ${err}`);
   });
