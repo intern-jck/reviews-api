@@ -15,21 +15,21 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
 
 
 // GET REQ
-const getReviews = (product_id, type) => {
-  console.log(`Getting ${type} for ${product_id}`);
-  switch(type) {
-    case 'list':
-      return Review.find({'product_id': product_id}).select('results')
-      .lean()
-      .exec();
+const getReviews = (product_id) => {
+  return Review.find({'product_id': product_id}).select('results')
+  .lean()
+  .exec();
+};
 
-    case 'meta':
-      return Review.find({'product_id': product_id}).select('meta')
-      .lean()
-      .exec();
-  }
-}
 
+const getReviewsMeta = (product_id) => {
+  return Review.find({'product_id': product_id}).select('meta')
+  .lean()
+  .exec();
+};
+
+
+//POST REQ
 const addReview = (review) => {
   console.log('New Review', review);
   return Review.findOneAndUpdate(
@@ -86,20 +86,9 @@ const addReview = (review) => {
         { 'upsert': true }
       );
     })
-}
-
-
-
-
-
-
-
-
-
-
-
+};
 
 
 module.exports = {
-  getReviews, addReview
+  getReviews, addReview, getReviewsMeta
 };
