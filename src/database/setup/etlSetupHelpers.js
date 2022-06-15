@@ -21,33 +21,21 @@ const addReviews = (csvPath) => {
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
-    console.log(typeof row.recommend)
-    const updateRating = {};
-    updateRating['meta.ratings.' + row.rating] = 1;
 
-    const updateRecommended = {};
+    // Need to store multiple inc operations in and object.
+    const incUpdates = {};
+
+    // Increment meta.ratings by 1
+    incUpdates['meta.ratings.' + row.rating] = 1;
+
+    // Increment meta.recommended by 1
     if (row.recommend === 'false') {
-      updateRecommended['meta.recommended.0'] = 1;
+      incUpdates['meta.recommended.0'] = 1;
     } else if (row.recommend === 'true') {
-      updateRecommended['meta.recommended.1'] = 1;
+      incUpdates['meta.recommended.1'] = 1;
     }
 
-    // const reviewOP = {
-    //   updateOne: {
-    //     'filter' : { 'product_id': row.product_id },
-    //     'update': {
-    //       '$push': {
-    //         'results': {
-    //           'id':  row.id,
-    //         }
-    //       },
-    //       '$inc': updateRating,
-    //       // '$inc': updateRecommends
-    //     },
-    //     'upsert': true
-    //   }
-    // };
-
+    // Store everything in an operation
     const reviewOP = {
       updateOne: {
         'filter': { 'product_id': row.product_id},
@@ -57,16 +45,14 @@ const addReviews = (csvPath) => {
               'id': row.id,
             }
           },
-          // '$inc': updateRating,
-          // '$inc': { 'meta.recommended.0': 1}
-          '$inc': updateRecommended
+          '$inc': incUpdates
+          // '$inc': updateRecommended
         },
         'upsert': true,
       }
     }
 
-
-
+    // Add it to the queue.
     operations.push(reviewOP);
 
     if (operations.length > 1000) {
@@ -88,23 +74,23 @@ const addReviews = (csvPath) => {
     const tEnd = performance.now();
     console.log(`Added ${rowCount} rows in ${tEnd - t0}`);
 
-    // // Hacky way to keep track of reviews
-    // const filter = { 'product_id': 0};
-    // const update = { '$set': { 'review_count': rowCount } }
-    // const options = {
-    //   returnNewDocument: true,
-    //   new: true,
-    //   strict: false,
-    //   upsert: true
-    // }
+    // Hacky way to keep track of reviews
+    const filter = { 'product_id': 0};
+    const update = { '$set': { 'review_count': rowCount } }
+    const options = {
+      returnNewDocument: true,
+      new: true,
+      strict: false,
+      upsert: true
+    }
 
-    // const callback = (err, doc) => {
-    //   if (err) { console.log(err) }
-    //   if (doc) { console.log(doc) }
-    //   console.log('end')
-    // };
+    const callback = (err, doc) => {
+      if (err) { console.log(err) }
+      if (doc) { console.log(doc) }
+      console.log('end')
+    };
 
-    // BasicReview.findOneAndUpdate(filter, update, options, callback);
+    BasicReview.findOneAndUpdate(filter, update, options, callback);
 
   });
 };
