@@ -8,7 +8,7 @@ const photosLength = 2742540;
 const chracteristicsLength = 3347679;
 const reviewChracteristicsLength = 19327575;
 
-const BasicReview = require('../ReviewModel.js');
+const BasicReview = require('../database/ReviewModel.js');
 
 
 const addReviews = (csvPath) => {
