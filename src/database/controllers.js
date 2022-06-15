@@ -13,7 +13,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
     console.log(`MongoDB ERR ${err}`);
   });
 
-
 // GET REQ
 const getReviews = (product_id) => {
   return Review.find({'product_id': product_id}).select('results')
@@ -21,13 +20,11 @@ const getReviews = (product_id) => {
   .exec();
 };
 
-
 const getReviewsMeta = (product_id) => {
   return Review.find({'product_id': product_id}).select('meta')
   .lean()
   .exec();
 };
-
 
 //POST REQ
 const addReview = (review) => {
