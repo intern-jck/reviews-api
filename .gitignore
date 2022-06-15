@@ -1,2 +1,9 @@
 /node_modules
-/reviews-raw
+/data-raw
+/data-1M
+/data-100K
+/data-50K
+/data-1K
+/data-test
+/time-data
+/rawData.tar.gz
