@@ -76,11 +76,10 @@ const addReviews = (csvPath) => {
   })
   .on('end', (rowCount) => {
 
-    operations.push(reviewLastOP);
-    BasicReview.bulkWrite(operations).then((doc) => (console.log(doc)));
+    BasicReview.bulkWrite(operations);
 
     const tEnd = performance.now();
-    console.log(`Added ${rowCount} rows in ${tEnd - t0}`);
+    console.log(`Added ${rowCount} rows in ${Math.round(tEnd - t0)}`);
 
     // Hacky way to keep track of reviews
     const filter = { 'product_id': 0};
@@ -96,10 +95,135 @@ const addReviews = (csvPath) => {
   });
 };
 
+const addPhotos = (csvPath) => {
+
+  let operations = [];
+  console.log(`Adding Photos`);
+  const t0 = performance.now();
+
+  fs.createReadStream(path.resolve(__dirname, csvPath))
+  .pipe(csv.parse({ headers: true }))
+  .on('error', error => console.error(error))
+  .on('data', (row) => {
+
+    const photosOP = {
+      updateOne: {
+        'filter': { "results.id": row.review_id },
+        'update': {
+          $push: { 'results.$.photos': {
+            'id': row.id,
+            'url': row.url,
+          }},
+          'upsert': true
+        },
+      }
+    };
+
+    operations.push(photosOP);
+
+    if (operations.length > 1000) {
+      BasicReview.bulkWrite(operations);
+      const tEnd = performance.now();
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ 50000) * 100)}%`);
+      operations = [];
+    }
+
+  })
+  .on('end', (rowCount) => {
+    BasicReview.bulkWrite(operations);
+    const tEnd = performance.now();
+    console.log(`Added ${rowCount} rows in ${Math.round(tEnd - t0)}`)
+  });
+};
+
+const addCharacteristics = (csvPath) => {
+
+  let operations = [];
+  const t0 = performance.now();
+
+  fs.createReadStream(path.resolve(__dirname, csvPath))
+  .pipe(csv.parse({ headers: true }))
+  .on('error', error => console.error(error))
+  .on('data', (row) => {
+
+    const newCharacteristic = {};
+    newCharacteristic['meta.characteristics.' + row.id] = {
+      name: row.name,
+      value: []
+    };
+
+    const updateOne = {
+      updateOne: {
+        'filter': { 'product_id': row.product_id },
+        'update': { '$set': newCharacteristic },
+      }
+    };
+
+    operations.push(updateOne)
+
+    if(operations.length > 1000) {
+      BasicReview.bulkWrite(operations);
+      const tEnd = performance.now();
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ 50000) * 100)}%`);
+      operations = [];
+    }
+
+  })
+  .on('end', (rowCount) => {
+    BasicReview.bulkWrite(operations);
+    if(operations.length > 0) {
+    const tEnd = performance.now();
+    console.log(`Added ${rowCount} rows in ${Math.round(tEnd - t0)}`);
+    }
+  });
+
+};
+
+const updateCharacteristics = (csvPath) => {
+
+  let operations = [];
+  const t0 = performance.now();
+
+  fs.createReadStream(path.resolve(__dirname, csvPath))
+  .pipe(csv.parse({ headers: true }))
+  .on('error', error => console.error(error))
+  .on('data', (row) => {
+
+    const updateCharacteristic = {};
+    updateCharacteristic['meta.characteristics.' + row.characteristic_id + '.value'] = parseInt(row.value);
+
+    const updateOne = {
+      updateOne: {
+        'filter': { 'results.id': row.review_id },
+        'update': { '$push': updateCharacteristic },
+      }
+    };
+
+    operations.push(updateOne)
+
+    if(operations.length > 1000) {
+      BasicReview.bulkWrite(operations);
+      const tEnd = performance.now();
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ 50000) * 100)}%`);
+      operations = [];
+    }
+
+  })
+  .on('end', (rowCount) => {
+    if(operations.length > 0) {
+      BasicReview.bulkWrite(operations);
+      operations = [];
+    }
+    const tEnd = performance.now();
+    console.log(`Added ${rowCount} rows in ${Math.round(tEnd - t0)}`)
+  });
+
+};
+
 
 module.exports = {
   addReviews,
-  // addPhotos,
-  // addCharacteristics,
-  // updateCharacteristics
+  addPhotos,
+  addCharacteristics,
+  updateCharacteristics
 };

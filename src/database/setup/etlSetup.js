@@ -28,18 +28,18 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
   .then(() => {
     console.log(`MongoDB Connected!`);
   })
-  .then(() => {
-    addReviews(reviewsCSV);
-  })
+  // .then(() => {
+  //   addReviews(reviewsCSV);
+  // })
   // .then(() => {
   //   addPhotos(photosCSV);
   // })
   // .then(() => {
   //   addCharacteristics(characteristicsCSV);
   // })
-  // .then(() => {
-  //   updateCharacteristics(characteristicReviewsCSV);
-  // })
+  .then(() => {
+    updateCharacteristics(characteristicReviewsCSV);
+  })
   .catch((err) => {
     console.log(`MongoDB ERR ${err}`);
   });
