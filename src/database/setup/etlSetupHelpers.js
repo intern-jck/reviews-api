@@ -21,16 +21,16 @@ const addReviews = (csvPath) => {
   .pipe(csv.parse({ headers: true }))
   .on('error', error => console.error(error))
   .on('data', (row) => {
-
+    console.log(typeof row.recommend)
     const updateRating = {};
     updateRating['meta.ratings.' + row.rating] = 1;
 
-    // const updateRecommends = {};
-    // if (row.recommend === 'false') {
-    //   updateRecommends['meta.recommends.0'] = 1;
-    // } else if (row.recommend === 'true') {
-    //   updateRecommends['meta.recommends.1'] = 1;
-    // }
+    const updateRecommended = {};
+    if (row.recommend === 'false') {
+      updateRecommended['meta.recommended.0'] = 1;
+    } else if (row.recommend === 'true') {
+      updateRecommended['meta.recommended.1'] = 1;
+    }
 
     // const reviewOP = {
     //   updateOne: {
@@ -57,8 +57,9 @@ const addReviews = (csvPath) => {
               'id': row.id,
             }
           },
-          '$inc': updateRating,
-          // '$inc': updateRecommends
+          // '$inc': updateRating,
+          // '$inc': { 'meta.recommended.0': 1}
+          '$inc': updateRecommended
         },
         'upsert': true,
       }
