@@ -4,9 +4,9 @@ const csv = require('fast-csv');
 const mongoose = require('mongoose');
 const { addReviews, addPhotos, addCharacteristics, updateCharacteristics } = require('./etlSetupHelpers.js');
 
-const reviewsCSV = '../../../data-1K/reviews1K.csv';
+// const reviewsCSV = '../../../data-1K/reviews1K.csv';
 
-// const reviewsCSV = '../../../data-50K/reviews50K.csv';
+const reviewsCSV = '../../../data-50K/reviews50K.csv';
 const photosCSV = '../../../data-50K/photos50K.csv';
 const characteristicsCSV = '../../../data-50K/characteristics50K.csv';
 const characteristicReviewsCSV = '../../../data-50K/characteristicReviews50K.csv';

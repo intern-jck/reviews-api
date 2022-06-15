@@ -10,9 +10,11 @@ const reviewChracteristicsLength = 19327575;
 
 const BasicReview = require('../ReviewModel.js');
 
-let operations = [];
 
 const addReviews = (csvPath) => {
+
+  let operations = [];
+
   console.log(`Adding Reviews`);
 
   const t0 = performance.now();
@@ -42,11 +44,20 @@ const addReviews = (csvPath) => {
         'update': {
           '$push': {
             'results': {
-              'id': row.id,
+              'id':  row.id,
+              'rating':  row.rating,
+              'date': row.date,
+              'summary': row.summary,
+              'body': row.body,
+              'recommend': row.recommend,
+              'reported': row.reported,
+              'reviewer_name': row.reviewer_name,
+              'reviewer_email': row.reviewer_email,
+              'response': row.response,
+              'helpfulness': row.helpfulness,
             }
           },
           '$inc': incUpdates
-          // '$inc': updateRecommended
         },
         'upsert': true,
       }
@@ -56,9 +67,8 @@ const addReviews = (csvPath) => {
     operations.push(reviewOP);
 
     if (operations.length > 1000) {
-      console.log(updateRating);
       const tEnd = performance.now();
-      // console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ reviewsLength) * 100)}%`);
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ 50000) * 100)}%`);
       BasicReview.bulkWrite(operations);
       operations = [];
     }
@@ -66,10 +76,8 @@ const addReviews = (csvPath) => {
   })
   .on('end', (rowCount) => {
 
-    if(operations.length > 0) {
-      BasicReview.bulkWrite(operations);
-      operations = [];
-    }
+    operations.push(reviewLastOP);
+    BasicReview.bulkWrite(operations).then((doc) => (console.log(doc)));
 
     const tEnd = performance.now();
     console.log(`Added ${rowCount} rows in ${tEnd - t0}`);
@@ -78,19 +86,12 @@ const addReviews = (csvPath) => {
     const filter = { 'product_id': 0};
     const update = { '$set': { 'review_count': rowCount } }
     const options = {
-      returnNewDocument: true,
       new: true,
       strict: false,
       upsert: true
     }
 
-    const callback = (err, doc) => {
-      if (err) { console.log(err) }
-      if (doc) { console.log(doc) }
-      console.log('end')
-    };
-
-    BasicReview.findOneAndUpdate(filter, update, options, callback);
+    BasicReview.findOneAndUpdate(filter, update, options).then((doc) => ( console.log(doc)));
 
   });
 };
