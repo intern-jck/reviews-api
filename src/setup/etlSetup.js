@@ -5,9 +5,9 @@ const mongoose = require('mongoose');
 const { addReviews, addPhotos, addCharacteristics, updateCharacteristics } = require('./etlSetupHelpers.js');
 
 const reviewsCSV = '../../../api-data/raw-data/reviewsRaw.csv';
-// const photosCSV = '../../data-raw/photosRaw.csv';
-// const characteristicsCSV = '../../data-raw/characteristicsRaw.csv';
-// const characteristicReviewsCSV = '../../data-raw/characteristicReviewsRaw.csv';
+const photosCSV = '../../../api-data/raw-data/photosRaw.csv';
+const characteristicsCSV = '../../../api-data/raw-data/characteristicsRaw.csv';
+const characteristicReviewsCSV = '../../../api-data/raw-data/characteristicReviewsRaw.csv';
 
 // Need to add a port number?
 mongoose.connect('mongodb://127.0.0.1:27017/reviews',
@@ -23,7 +23,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
   });
 
 
-addReviews(reviewsCSV);
+// addReviews(reviewsCSV);
 // addPhotos(photosCSV);
 // addCharacteristics(characteristicsCSV);
-// updateCharacteristics(characteristicReviewsCSV);
+updateCharacteristics(characteristicReviewsCSV);
