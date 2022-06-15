@@ -44,6 +44,9 @@ app.get('/*', (req, res) => {
 app.post('/*', (req, res) => {
   // console.log('GOT: ',req.body)
   addReview(req.body)
+    .then((doc) => {
+      res.sendStatus(201)
+    });
 });
 
 app.listen(PORT, function() {

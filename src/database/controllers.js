@@ -30,51 +30,75 @@ const getReviews = (product_id, type) => {
   }
 }
 
-// const updateReviewCount = () => {
-//   return
-//     Review.find(
-//       { 'product_id': 0 },
-//     )
-//     .exec();
-// }
-
 const addReview = (review) => {
   console.log('New Review', review);
-
-  let newCount = 0;
-  // Update Review Count
-  Review.find(
+  return Review.findOneAndUpdate(
     { 'product_id': 0 },
+    {
+      '$inc': { 'review_count': 1}
+    },
+    {
+      new: true,
+      strict: false
+    }
   )
-  .exec()
-  .then((doc) => {
-    console.log('db', doc)
-    return doc[0].toObject().review_count;
-  })
-  .then((data) => {
-    console.log(data);
-    const filter = { 'product_id': review.product_id};
-    const update = {
-      $push: {
-        results: {
-          'id':  data,
-          'rating':  review.rating,
-          'date': review.date,
-          'summary': review.summary,
-          'body': review.body,
-          'recommend': review.recommend,
-          'reported': review.reported,
-          'reviewer_name': review.reviewer_name,
-          'reviewer_email': review.reviewer_email,
-          'response': review.response,
-          'helpfulness': review.helpfulness,
-        }
+    .lean()
+    .exec()
+    .then((doc) => {
+      console.log(doc.review_count);
+
+      const incUpdates = {};
+      // Increment meta.ratings by 1
+      incUpdates['meta.ratings.' + review.rating] = 1;
+      // Increment meta.recommended by 1
+      if (review.recommend === 'false') {
+        incUpdates['meta.recommended.0'] = 1;
+      } else if (review.recommend === 'true') {
+        incUpdates['meta.recommended.1'] = 1;
       }
-    };
-    return Review.updateOne(filter, update).exec();
-  })
-  .catch();
+
+      const update = {
+        '$push': {
+          'results': {
+            'id':  doc.review_count + 1,
+            'rating':  review.rating,
+            'date': new Date().toISOString(),
+            'summary': review.summary,
+            'body': review.body,
+            'recommend': review.recommend,
+            'reported': review.reported,
+            'reviewer_name': review.name,
+            'reviewer_email': review.email,
+            'response': review.response,
+            'helpfulness': review.helpfulness,
+          }
+        },
+        '$inc': incUpdates
+      }
+
+      for (let key in review.characteristics) {
+        update.$push['meta.characteristics.' + key + '.value'] = parseInt(review.characteristics[key])
+      }
+
+      return Review.updateOne(
+        { 'product_id': review.product_id },
+        update,
+        { 'upsert': true }
+      );
+    })
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 module.exports = {
   getReviews, addReview
