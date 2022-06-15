@@ -62,6 +62,7 @@ const addReviews = (csvPath) => {
     operations.push(reviewOP);
 
     if (operations.length > 1000) {
+      console.log(updateRating);
       const tEnd = performance.now();
       // console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ reviewsLength) * 100)}%`);
       BasicReview.bulkWrite(operations);
