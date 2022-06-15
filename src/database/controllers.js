@@ -89,6 +89,15 @@ const addReview = (review) => {
 };
 
 
+//PUT REQ
+const markHelpful = (review_id) => {
+
+}
+
+const reportReview = (review_id) => {
+
+}
+
 module.exports = {
-  getReviews, addReview, getReviewsMeta
+  getReviews, addReview, getReviewsMeta, markHelpful, reportReview
 };

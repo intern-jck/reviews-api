@@ -5,7 +5,7 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
-const { getReviews, addReview, getReviewsMeta } = require('./database/controllers.js');
+const { getReviews, addReview, getReviewsMeta, markHelpful, reportReview } = require('./database/controllers.js');
 
 app.get('/reviews/:product_id/meta', (req, res) => {
 
@@ -53,7 +53,14 @@ app.post('/reviews/:product_id', (req, res) => {
     });
 });
 
-app.put('/*')
+app.put('/reviews/:review_id/helpful', (req, res) => {
+  markHelpful(req.params.review_id);
+});
+
+app.put('/reviews/:review_id/report', (req, res) => {
+  reportReview(req.params.review_id);
+});
+
 
 app.listen(PORT, function() {
   console.log(`@http://localhost:${PORT} on port ${PORT}`);
