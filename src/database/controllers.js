@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const Review = require('./ReviewModel.js');
 
-const API_URL = "ec2-34-207-158-128.compute-1.amazonaws.com";
-
-mongoose.connect('mongodb://127.0.0.1:27017/reviews',
+mongoose.connect('mongodb://44.202.64.225:27017/testbench',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
