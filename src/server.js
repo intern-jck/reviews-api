@@ -5,19 +5,13 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
-
-
 const { getReviews, addReview, getReviewsMeta, markHelpful, reportReview } = require('./database/controllers.js');
 
 app.get('/reviews/:product_id/meta', (req, res) => {
-
-  console.log(req.url, req.params.product_id);
   getReviewsMeta(req.params.product_id)
   .then((doc) => {
     const chars = doc[0].meta.characteristics;
-    console.log(chars)
     for (let c in chars) {
-      console.log(c, chars[c].name)
       chars[chars[c].name] = { 'id': c, 'value': chars[c].value.reduce((a, b) => (a + b)) / chars[c].value.length};
       delete chars[c];
     }
@@ -29,9 +23,6 @@ app.get('/reviews/:product_id/meta', (req, res) => {
 });
 
 app.get('/reviews/:product_id/list', (req, res) => {
-  console.log(req.url);
-  console.log(req.params.product_id, req.query);
-
   getReviews(req.params.product_id)
   .then((doc) => {
     doc[0].product_id = req.params.product_id;
@@ -43,9 +34,7 @@ app.get('/reviews/:product_id/list', (req, res) => {
     res.sendStatus(404);
     console.log(error);
   });
-
 });
-
 
 app.post('/reviews/:product_id', (req, res) => {
   req.body.product_id = req.params.product_id;
@@ -63,8 +52,6 @@ app.put('/reviews/:review_id/report', (req, res) => {
   reportReview(req.params.review_id);
 });
 
-
 app.listen(PORT, function() {
   console.log(`@http://localhost:${PORT} on port ${PORT}`);
 });
-

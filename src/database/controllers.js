@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const Review = require('./ReviewModel.js');
 
-const API_URL = "ec2-34-207-158-128.compute-1.amazonaws.com";
+// const API_URL = "ec2-34-207-158-128.compute-1.amazonaws.com";
 
-mongoose.connect('mongodb://127.0.0.1:27017/reviews',
+mongoose.connect('mongodb://3.92.68.206:27017/testbench',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -17,7 +17,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/reviews',
 
 // GET REQ
 const getReviews = (product_id) => {
-  return Review.find({'product_id': product_id}).select('results')
+  return Review.find({'product_id': product_id}).select('results').limit(10)
   .lean()
   .exec();
 };
