@@ -18,11 +18,8 @@ mongosh
 
 for redoing database
 
-<<<<<<< HEAD
-=======
 for redoing database
 
->>>>>>> 4768fb60ba7456b009a33530aec381e7b8b6c7b6
 Drop collection
 db.reviews.drop()
 Create new one

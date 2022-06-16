@@ -14,9 +14,6 @@ const BasicReview = require('../database/ReviewModel.js');
 const addReviews = (csvPath) => {
 
   let operations = [];
-
-  console.log(`Adding Reviews`);
-
   const t0 = performance.now();
 
   fs.createReadStream(path.resolve(__dirname, csvPath))
@@ -66,9 +63,9 @@ const addReviews = (csvPath) => {
     // Add it to the queue.
     operations.push(reviewOP);
 
-    if (operations.length > 1000) {
+    if (operations.length > 2500) {
       const tEnd = performance.now();
-      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ 50000) * 100)}%`);
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ reviewsLength) * 100)}%`);
       BasicReview.bulkWrite(operations);
       operations = [];
     }
@@ -77,7 +74,6 @@ const addReviews = (csvPath) => {
   .on('end', (rowCount) => {
 
     BasicReview.bulkWrite(operations);
-
     const tEnd = performance.now();
     console.log(`Added ${rowCount} rows in ${Math.round(tEnd - t0)}`);
 
@@ -98,7 +94,6 @@ const addReviews = (csvPath) => {
 const addPhotos = (csvPath) => {
 
   let operations = [];
-  console.log(`Adding Photos`);
   const t0 = performance.now();
 
   fs.createReadStream(path.resolve(__dirname, csvPath))
@@ -110,7 +105,7 @@ const addPhotos = (csvPath) => {
       updateOne: {
         'filter': { "results.id": row.review_id },
         'update': {
-          $push: { 'results.$.photos': {
+          '$push': { 'results.$.photos': {
             'id': row.id,
             'url': row.url,
           }},
@@ -121,10 +116,10 @@ const addPhotos = (csvPath) => {
 
     operations.push(photosOP);
 
-    if (operations.length > 1000) {
+    if (operations.length > 2500) {
       BasicReview.bulkWrite(operations);
       const tEnd = performance.now();
-      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ 50000) * 100)}%`);
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ photosLength) * 100)}%`);
       operations = [];
     }
 
@@ -161,20 +156,18 @@ const addCharacteristics = (csvPath) => {
 
     operations.push(updateOne)
 
-    if(operations.length > 1000) {
+    if(operations.length > 2500) {
       BasicReview.bulkWrite(operations);
       const tEnd = performance.now();
-      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ 50000) * 100)}%`);
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ chracteristicsLength) * 100)}%`);
       operations = [];
     }
 
   })
   .on('end', (rowCount) => {
     BasicReview.bulkWrite(operations);
-    if(operations.length > 0) {
     const tEnd = performance.now();
     console.log(`Added ${rowCount} rows in ${Math.round(tEnd - t0)}`);
-    }
   });
 
 };
@@ -201,19 +194,16 @@ const updateCharacteristics = (csvPath) => {
 
     operations.push(updateOne)
 
-    if(operations.length > 1000) {
+    if(operations.length > 2500) {
       BasicReview.bulkWrite(operations);
       const tEnd = performance.now();
-      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ 50000) * 100)}%`);
+      console.log(`Bulk Update @ ${Math.round(tEnd - t0)} : ${Math.round((parseInt(row.id)/ reviewChracteristicsLength) * 100)}%`);
       operations = [];
     }
 
   })
   .on('end', (rowCount) => {
-    if(operations.length > 0) {
-      BasicReview.bulkWrite(operations);
-      operations = [];
-    }
+    BasicReview.bulkWrite(operations);
     const tEnd = performance.now();
     console.log(`Added ${rowCount} rows in ${Math.round(tEnd - t0)}`)
   });
