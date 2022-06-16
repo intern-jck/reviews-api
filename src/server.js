@@ -5,39 +5,40 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
-
-
 const { getReviews, addReview, getReviewsMeta, markHelpful, reportReview } = require('./database/controllers.js');
 
-app.get('/meta', (req, res) => {
-
+app.get('/reviews/:product_id/meta', (req, res) => {
   console.log(req.url);
-  console.log(req.query);
-
-  getReviewsMeta(req.query.product_id)
+  console.log(req.params);
+  getReviewsMeta(req.params.product_id)
   .then((doc) => {
+    const chars = doc[0].meta.characteristics;
+    for (let c in chars) {
+      chars[chars[c].name] = { 'id': c, 'value': chars[c].value.reduce((a, b) => (a + b)) / chars[c].value.length};
+      delete chars[c];
+    }
     res.send(doc);
   })
   .catch((error) => {
+    res.sendStatus(404);
     console.log(error)
   });
-
 });
 
-app.get('/list', (req, res) => {
-
+app.get('/reviews/:product_id/list', (req, res) => {
   console.log(req.url);
-  console.log(req.query);
-
-  getReviews(req.query.product_id)
+  console.log(req.params);
+  getReviews(req.params.product_id)
   .then((doc) => {
+    doc[0].product_id = req.params.product_id;
+    doc[0].page = 1;
+    doc[0].count = req.query.count;
     res.send(doc);
   })
   .catch((error) => {
     res.sendStatus(404);
     console.log(error);
   });
-
 });
 
 
