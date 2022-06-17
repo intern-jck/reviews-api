@@ -6,7 +6,8 @@
   "description": "database service",
   "scripts": {
     "test": "jest",
-    "server-dev": "nodemon run src/server.js",
+    "server-prod": "node src/server.js",
+    "server-dev": "nodemon src/server.js",
     "db-build": "node src/setup/etlSetup.js"
   },
   "dependencies": {
