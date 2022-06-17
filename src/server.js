@@ -8,8 +8,7 @@ app.use(express.json());
 const { getReviews, addReview, getReviewsMeta, markHelpful, reportReview } = require('./database/controllers.js');
 
 app.get('/reviews/:product_id/meta', (req, res) => {
-  console.log(req.url);
-  console.log(req.params);
+  // console.log(req.url);
   getReviewsMeta(req.params.product_id)
   .then((doc) => {
     const chars = doc[0].meta.characteristics;
@@ -26,8 +25,6 @@ app.get('/reviews/:product_id/meta', (req, res) => {
 });
 
 app.get('/reviews/:product_id/list', (req, res) => {
-  console.log(req.url);
-  console.log(req.params);
   getReviews(req.params.product_id)
   .then((doc) => {
     doc[0].product_id = req.params.product_id;
