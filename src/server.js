@@ -1,4 +1,5 @@
-const PORT = 3000;
+require('dotenv').config();
+const PORT = process.env.PORT;
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -6,6 +7,20 @@ app.use(cors());
 app.use(express.json());
 
 const { getReviews, addReview, getReviewsMeta, markHelpful, reportReview } = require('./database/controllers.js');
+
+app.get('/reviews/:product_id/list', (req, res) => {
+  getReviews(req.params.product_id)
+  .then((doc) => {
+    doc[0].product_id = req.params.product_id;
+    doc[0].page = 1;
+    doc[0].count = req.query.count;
+    res.send(doc);
+  })
+  .catch((error) => {
+    res.sendStatus(404);
+    console.log(error);
+  });
+});
 
 app.get('/reviews/:product_id/meta', (req, res) => {
   getReviewsMeta(req.params.product_id)
@@ -23,19 +38,6 @@ app.get('/reviews/:product_id/meta', (req, res) => {
   });
 });
 
-app.get('/reviews/:product_id/list', (req, res) => {
-  getReviews(req.params.product_id)
-  .then((doc) => {
-    doc[0].product_id = req.params.product_id;
-    doc[0].page = 1;
-    doc[0].count = req.query.count;
-    res.send(doc);
-  })
-  .catch((error) => {
-    res.sendStatus(404);
-    console.log(error);
-  });
-});
 
 
 app.post('/review', (req, res) => {

@@ -1,7 +1,10 @@
+require('dotenv').config();
+// console.log(process.env);
+
 const mongoose = require('mongoose');
 const Review = require('./ReviewModel.js');
-
-mongoose.connect('mongodb://127.0.0.1:27017/testbench',
+const mongoURL = `mongodb://${process.env.REVIEWS_USER}:${process.env.REVIEWS_PWD}@${process.env.DATABASE_IP}:27017/reviews`;
+mongoose.connect(mongoURL,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -25,7 +28,6 @@ const getReviewsMeta = (product_id) => {
   // .lean()
   .exec();
 };
-
 
 //POST REQ
 const addReview = (review) => {

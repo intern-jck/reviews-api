@@ -33,5 +33,5 @@ const ReviewSchema = new Schema({
   }
 });
 
-const Review = mongoose.model('Apitests', ReviewSchema);
+const Review = mongoose.model('Reviews', ReviewSchema);
 module.exports = Review;
