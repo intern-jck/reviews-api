@@ -1,19 +1,20 @@
 {
   "name": "sdc-database",
+  "author": "Justin C Kirk",
+  "license": "ISC",
   "version": "1.0.0",
   "description": "database service",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "server-dev": "nodemon run src/server.js",
     "db-build": "node src/setup/etlSetup.js"
   },
-  "author": "Justin C Kirk",
-  "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "fast-csv": "^4.3.6",
+    "jest": "^28.1.1",
     "mongoose": "^6.3.6"
   }
 }
