@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const Review = require('./ReviewModel.js');
 
-// mongoose.connect('mongodb://127.0.0.1:27017/testbench',
-mongoose.connect('mongodb://apiUser:pineapple@44.202.64.225:27017/testbench',
+mongoose.connect('mongodb://127.0.0.1:27017/testbench',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
