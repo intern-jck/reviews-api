@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Review = require('./ReviewModel.js');
 
-mongoose.connect('mongodb://44.202.64.225:27017/testbench',
+// mongoose.connect('mongodb://127.0.0.1:27017/testbench',
+mongoose.connect('mongodb://apiUser:pineapple@44.202.64.225:27017/testbench',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -16,15 +17,16 @@ mongoose.connect('mongodb://44.202.64.225:27017/testbench',
 // GET REQ
 const getReviews = (product_id) => {
   return Review.find({'product_id': product_id}).select('results')
-  .lean()
+  // .lean()
   .exec();
 };
 
 const getReviewsMeta = (product_id) => {
   return Review.find({'product_id': product_id}).select('meta')
-  .lean()
+  // .lean()
   .exec();
 };
+
 
 //POST REQ
 const addReview = (review) => {
@@ -39,7 +41,7 @@ const addReview = (review) => {
       strict: false
     }
   )
-  .lean()
+  // .lean()
   .exec()
   .then((doc) => {
     console.log(doc.review_count);
