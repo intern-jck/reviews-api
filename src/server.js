@@ -10,8 +10,10 @@ app.use(express.static('public'));
 const { getReviews, addReview, getReviewsMeta, markHelpful, reportReview } = require('./database/controllers.js');
 
 app.get('/reviews/:product_id/list', (req, res) => {
+  console.log(req.params);
   getReviews(req.params.product_id)
   .then((doc) => {
+    // console.log(doc)
     doc[0].product_id = req.params.product_id;
     doc[0].page = 1;
     doc[0].count = req.query.count;
@@ -39,12 +41,15 @@ app.get('/reviews/:product_id/meta', (req, res) => {
   });
 });
 
-app.post('/review', (req, res) => {
+app.post('/reviews/:product_id', (req, res) => {
   req.body.product_id = req.params.product_id;
-  // addReview(req.body)
-  //   .then((doc) => {
-  //     res.sendStatus(201)
-  //   });
+  addReview(req.body)
+    .then((doc) => {
+      console.log('POST MADE', doc)
+      res.sendStatus(201)
+    });
+
+
 });
 
 // app.put('/helpful', (req, res) => {
