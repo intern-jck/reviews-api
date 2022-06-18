@@ -1,12 +1,12 @@
 {
-  "name": "sdc-database",
+  "name": "sdc-server",
   "author": "Justin C Kirk",
   "license": "ISC",
   "version": "1.0.0",
-  "description": "database service",
+  "description": "reviews service server",
   "scripts": {
     "test": "jest",
-    "server-dev": "nodemon src/server.js"
+    "server-dev": "npx nodemon src/server.js"
   },
   "dependencies": {
     "axios": "^0.27.2",

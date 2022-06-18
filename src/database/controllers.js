@@ -1,9 +1,9 @@
 require('dotenv').config();
-console.log(process.env);
-
+//console.log(process.env);
 const mongoose = require('mongoose');
 const Review = require('./ReviewModel.js');
 const mongoURL = `mongodb://${process.env.REVIEWS_USER}:${process.env.REVIEWS_PWD}@${process.env.DATABASE_IP}:27017/reviews`;
+
 mongoose.connect(mongoURL,
   {
     useNewUrlParser: true,

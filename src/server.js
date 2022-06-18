@@ -5,6 +5,7 @@ const app = express();
 const cors = require('cors');
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 
 const { getReviews, addReview, getReviewsMeta, markHelpful, reportReview } = require('./database/controllers.js');
 
@@ -37,8 +38,6 @@ app.get('/reviews/:product_id/meta', (req, res) => {
     console.log(error)
   });
 });
-
-
 
 app.post('/review', (req, res) => {
   req.body.product_id = req.params.product_id;
